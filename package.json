@@ -1,0 +1,16 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxi build",
+    "dev": "nuxi dev",
+    "start": "nuxi preview"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^18",
+    "nuxt": "^3.4.3"
+  }
+}
