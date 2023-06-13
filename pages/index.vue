@@ -1,12 +1,16 @@
 
 <script setup>
-    const MSG_PERSONA_AGREGADA = 'Persona Agregada'
+    import { nextTick } from 'vue';
+
+    const MSG_AGREGAR_PERSONAS = 'Agregar personas con Gasto'
 
     const currentPersona = ref('')
     const currentPersonaId = ref('');
     const currentGasto = ref('')
     const currentGastoId = ref('');
     const currentGastoImporte = ref('');
+
+    const currentGastoInput = ref([]);
 
     const showNewGastoInput = ref(false);
     const showEditGastoInput = ref(false);
@@ -40,8 +44,10 @@
     }
 
     const newGasto = (persona) => {
-        currentPersonaId.value = persona.id;
         showNewGastoInput.value = true;
+        currentPersonaId.value = persona.id;
+        const index = currentGastoInput.value.length - 1;
+        nextTick(() => currentGastoInput.value[index].focus());
     }
 
     const confirmarGasto = (persona) => {
@@ -87,10 +93,10 @@
     <main class="w-scren h-[75vh] m-10  bg-background text-default space-y-4">
         <!-- Agregar Persona -->
         <section class="w-full h-auto bg-secondary p-2 rounded-xl ">
-            <h1 class="text-xl">Agregar Personas</h1>
+            <h1 class="text-xl">{{ MSG_AGREGAR_PERSONAS }}</h1>
             <div class="my-4 space-y-4">
                 <div class="flex justify-between items-center bg-white rounded-xl p-4">
-                    <input type="text" class="border-b border-default outline-none bg-inherit placeholder:text-xs placeholder:opacity-50" v-model="currentPersona" placeholder="(nombre)">
+                    <input autofocus type="text" class="border-b border-default outline-none bg-inherit placeholder:text-xs placeholder:opacity-50" v-model="currentPersona" placeholder="(nombre)">
                     <svg fill="none" viewBox="0 0 24 24" stroke-width="1" class="w-10 h-10 stroke-default" @click="newPersona">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -113,9 +119,9 @@
                             <path d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <!-- Persona gastos edit inputs -->
-                    <div v-if="showNewGastoInput && currentPersonaId === persona.id" class="flex justify-between items-center px-5 py-2 border rounded-full border-indigo-200">
-                        <input type="text" class="border-b min-w-[30%] border-default outline-none bg-inherit placeholder:text-xs placeholder:opacity-50" v-model="currentGasto" placeholder="(que?)">
+                    <!-- Nuevo gasto inputs -->
+                    <div v-show="showNewGastoInput && currentPersonaId === persona.id" :class="`${persona.id}`" class="flex justify-between items-center px-5 py-2 border rounded-full border-indigo-200">
+                        <input ref="currentGastoInput" type="text" class="border-b min-w-[30%] border-default outline-none bg-inherit placeholder:text-xs placeholder:opacity-50 focus:bg-green-500" v-model="currentGasto" placeholder="(que?)">
                         <input v-model.number="number" type="text" class="border-b border-l-2 min-w-[30%] border-default outline-none bg-inherit pl-1  placeholder:text-xs placeholder:opacity-50 placeholder:pl-1 placeholder:text-left" v-model="currentGastoImporte" placeholder="(importe)">
                         <div class="flex justify-center items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-green-400" @click="confirmarGasto(persona)">
@@ -130,7 +136,7 @@
                     <ul v-if="persona.gastos.length > 0" class='flex flex-col space-y-2 my-2'>
                         <li v-for="(gasto,i) in persona.gastos" >
                             <!-- Editando Gasto -->
-                            <div v-if="showEditGastoInput && currentGastoId === gasto.id" class="flex justify-between items-center px-5 py-2  border rounded-full border-indigo-200">
+                            <div v-show="showEditGastoInput && currentGastoId === gasto.id" class="flex justify-between items-center px-5 py-2  border rounded-full border-indigo-200">
                                 <input type="text" class="border-b min-w-[30%] border-default outline-none bg-inherit placeholder:text-xs placeholder:opacity-50" v-model="currentGasto" placeholder="(que?)">
                                 <input v-model.number="number" type="text" class="border-b min-w-[30%] border-default outline-none bg-inherit placeholder:text-xs placeholder:opacity-50" v-model="currentGastoImporte" placeholder="(importe)">
                                 <div class="flex justify-center items-center gap-2">
@@ -143,7 +149,7 @@
                                 </div>
                             </div>
                             <!-- Mostrando Gasto -->
-                            <div v-else class="flex justify-between items-center px-5 py-2 border rounded-full border-indigo-200">
+                            <div class="flex justify-between items-center px-5 py-2 border rounded-full border-indigo-200">
                                 <h2 >{{ gasto.que }}: ${{ gasto.importe }}</h2>
                                 <div class="flex justify-center items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-orange-500" @click="editarGasto(persona,gasto)">
