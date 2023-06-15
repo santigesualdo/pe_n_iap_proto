@@ -7,10 +7,15 @@
     "start": "nuxi preview"
   },
   "dependencies": {
-    "@nuxtjs/tailwindcss": "^6.1.3"
+    "@nuxtjs/tailwindcss": "^6.1.3",
+    "@pinia/nuxt": "^0.4.11",
+    "pinia": "^2.1.4"
   },
   "devDependencies": {
     "@types/node": "^18",
     "nuxt": "^3.4.3"
+  },
+  "overrides": {
+    "vue": "latest"
   }
 }
