@@ -30,8 +30,13 @@
     }
 
     const newPersona = ()=>{
-        /* Si 'currentPersona' no tiene valor no agregar */
+        // TODO: 1 - si alguna validacion se ejecuta y se accede al return, mostrar mensaje
+
+        /* Si 'currentPersona' no tiene valor exit */
         if (!currentPersona.value) return;
+
+        /* Si 'currentPersona' ya existe exit */
+        if (personas.value.some(el => el.name === currentPersona.value)) return;
 
         personas.value.push(
             {
