@@ -95,7 +95,7 @@
 </script>
 
 <template>
-    <main class="w-scren h-[75vh] m-10  bg-background text-default space-y-4">
+    <main class="w-96 flex flex-col mx-auto my-16 h-auto m-10 text-default space-y-4">
         <!-- Agregar Persona -->
         <section class="w-full h-auto bg-secondary p-2 rounded-xl ">
             <h1 class="text-xl">{{ MSG_AGREGAR_PERSONAS }}</h1>
