@@ -136,7 +136,7 @@
                     <ul v-if="persona.gastos.length > 0" class='flex flex-col space-y-2 my-2'>
                         <li v-for="(gasto,i) in persona.gastos" >
                             <!-- Editando Gasto -->
-                            <div v-show="showEditGastoInput && currentGastoId === gasto.id" class="flex justify-between items-center px-5 py-2  border rounded-full border-indigo-200">
+                            <div v-if="showEditGastoInput && currentGastoId === gasto.id" class="flex justify-between items-center px-5 py-2  border rounded-full border-indigo-200">
                                 <input type="text" class="border-b min-w-[30%] border-default outline-none bg-inherit placeholder:text-xs placeholder:opacity-50" v-model="currentGasto" placeholder="(que?)">
                                 <input v-model.number="number" type="text" class="border-b min-w-[30%] border-default outline-none bg-inherit placeholder:text-xs placeholder:opacity-50" v-model="currentGastoImporte" placeholder="(importe)">
                                 <div class="flex justify-center items-center gap-2">
@@ -149,7 +149,7 @@
                                 </div>
                             </div>
                             <!-- Mostrando Gasto -->
-                            <div class="flex justify-between items-center px-5 py-2 border rounded-full border-indigo-200">
+                            <div v-else class="flex justify-between items-center px-5 py-2 border rounded-full border-indigo-200">
                                 <h2 >{{ gasto.que }}: ${{ gasto.importe }}</h2>
                                 <div class="flex justify-center items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-orange-500" @click="editarGasto(persona,gasto)">
