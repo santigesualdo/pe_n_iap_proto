@@ -2,6 +2,8 @@
 [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction)
 # Vue 3
 [Vue 3 Docs](https://vuejs.org/guide/introduction.html)
+# Pinia (global state management)
+[Pinia Docs](https://pinia.vuejs.org/)
 
 ## Setup
 Make sure to install the dependencies:
