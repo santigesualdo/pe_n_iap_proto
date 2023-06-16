@@ -4,14 +4,10 @@
     import { nextTick, onMounted } from 'vue'
 
     const { personas } = usePersonasStore()
-
-    onMounted(() => {
-        gastoTotal.value = calculoTotal(personas);
-    })
-
     const gastoTotal = ref(0)
-    const personasTotal = ref(0)
 
+    const personasTotal = ref(0)
+    const refTotal = ref([])
 
     const currentStep = ref(1);
 
@@ -25,6 +21,19 @@
 
     const showNewGastoInput = ref(false);
     const showEditGastoInput = ref(false);
+    const mensajesCopiados = ref(false)
+
+    const calculoTotal = (personas) => {
+        let gastoTot = 0;
+        personas.map(item=>{
+           const gastoPersona = item.gastos.reduce((ptotal, g)=> ptotal+Number(g.importe),0)
+           gastoTot+=gastoPersona;
+        })
+        return gastoTot;
+    }
+    onMounted(() => {
+        gastoTotal.value = calculoTotal(personas);
+    })
 
     const gastoPersona = (persona) => persona.gastos.reduce((a, b) => a+Number(b.importe), 0)
     const getPersona= (id) => personas.filter(_persona => _persona.id === id)[0]
@@ -62,15 +71,6 @@
         currentPersonaId.value = persona.id;
         const index = currentGastoInput.value.length - 1;
         nextTick(() => currentGastoInput.value[index].focus());
-    }
-
-    const calculoTotal = (personas) => {
-        let gastoTot = 0;
-        personas.map(item=>{
-           const gastoPersona = item.gastos.reduce((ptotal, g)=> ptotal+Number(g.importe),0)
-           gastoTot+=gastoPersona;
-        })
-        return gastoTot;
     }
 
     const confirmarGasto = (persona) => {
@@ -113,45 +113,40 @@
         limpiarEstados()
     }
 
-    const copiarResultados= () => {
-
-        const total = resultadosFinales(personas);
-
-        const mensajeClipboard = getMensajeClipboard(total);
-
-        navigator.clipboard.writeText(total);
-    }
-
     const resultadosFinales = (per) => {
         const resultados = []
-        const importePersonaSinGasto = (gastoTotal.value / personasTotal.value ).toFixed(2);
-        let totalPersonasSinGasto = [...per.map(persona=> persona.gastos)].length;
+        const importePersonaSinGasto = Number((gastoTotal.value / personasTotal.value ).toFixed(2));
+        let totalPersonasSinGasto =  personasTotal.value - [...per.map(persona=> persona.gastos)].length;
 
-        resultados.push(
-            `Las ${totalPersonasSinGasto} sin gasto deben pagar ${importePersonaSinGasto}`
-        )
-
+        // Personas con gastos
         per.forEach(persona=>{
             if (!persona.gastos) return false;
 
-            const gasto = gastoPersona(persona);
-            if (gasto> importePersonaSinGasto){
-                resultados.push(`${persona.name} debe recuperar ${Math.abs(gasto-importePersonaSinGasto)}`)
+            const gasto = Number(gastoPersona(persona).toFixed(2));
+
+            if (gasto > importePersonaSinGasto){
+                resultados.push(`${persona.name} pago $${gasto} y debe recuperar $${Math.abs(gasto-importePersonaSinGasto).toFixed(2)}`)
             }else{
-                resultados.push(gasto===importePersonaSinGasto ? `${persona.name} no debe pagar ni recuperar, todo listo.` : `${persona.name} debe pagar ${Math.abs(gasto-importePersonaSinGasto)}`)
+                resultados.push(gasto===importePersonaSinGasto ? `${persona.name} pago $${gasto} y no debe pagar ni recuperar nada.` : `${persona.name} pago $${gasto} y ademas debe pagar $${Math.abs(gasto-importePersonaSinGasto)}`)
             }
         })
+
+        // Personas sin gasto
+        if (totalPersonasSinGasto>0) resultados.push(`Las ${totalPersonasSinGasto} personas sin gasto deben pagar $${importePersonaSinGasto}`)
+
+        refTotal.value = [...resultados]
         return resultados
     }
 
-    const getMensajeClipboard = (total) => {
-        console.log(total)
+    const copiarResultados= (totales) => {
+        navigator.clipboard.writeText([...totales].join('\n'));
+        mensajesCopiados.value = true;
     }
-
 </script>
 
 <template>
     <main class="w-96 flex flex-col mx-auto my-16 h-auto m-10 text-default space-y-4">
+        <h1 class="text-2xl text-center">Peñapp Prototipo</h1>
         <template v-if="currentStep === 1">
             <!-- Agregar Persona -->
             <section class="w-full h-auto bg-secondary py-2 px-4 rounded-xl ">
@@ -239,14 +234,16 @@
                 <input class="w-full" type="range"  :min="personas.length+1" max="50" step="1" v-model="personasTotal">
                 <p class="flex justify-center text-2xl font-semibold">{{ personasTotal }}</p>
             </section>
-            <buttonNextStep text="Finalizar carga de personas" @click="currentStep++"/>
+            <buttonNextStep text="Finalizar carga de personas" @click="() => { currentStep++; resultadosFinales(personas)}"/>
         </template>
         <template v-if="currentStep === 3">
-            <section class="w-full h-auto bg-secondary py-2 px-4 rounded-xl space-y-2">
-                <h1 class="text-xl">Totales</h1>
-                <p id="totales">{{ JSON.stringify(personas) }}</p>
+            <section class="w-full h-auto bg-secondary py-2 px-4 rounded-xl space-y-2 font-semibold">
+                <h1>Resultados finales:</h1>
+                <h2> Total: ${{  gastoTotal }}</h2>
+                <h2 v-for="line in refTotal">- {{ line }}</h2>
+                <h2 v-show="mensajesCopiados" class="font-bold">Mensajes copiados al portapapeles.</h2>
             </section>
-            <buttonNextStep class="text-center" text="Copiar Resultados" @click="copiarResultados"/>
+            <buttonNextStep text="Copiar Resultados" @click="() => { copiarResultados(refTotal)} "/>
         </template>
     </main>
 </template>

@@ -4,9 +4,8 @@ export const usePersonasStore = defineStore( "PersonasStore", {
     state: () => {
         return {
             personas: []
-            /*
-                Para empezar con datos cargados y no morir ingresando datos todo el tiempo
-                personas: [
+            // Para empezar con datos cargados y no morir ingresando datos todo el tiempo
+           /*  personas: [
                 {
                     name: 'San',
                     gastos: [
@@ -25,7 +24,7 @@ export const usePersonasStore = defineStore( "PersonasStore", {
                         }
                     ]
                 }
-            ]*/
+            ] */
         }
     }
 })
