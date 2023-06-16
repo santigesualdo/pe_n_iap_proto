@@ -1,8 +1,10 @@
 
 <script setup>
+    import { usePersonasStore } from '@/stores/PersonasStore'
     import { nextTick } from 'vue';
 
-    const MSG_AGREGAR_PERSONAS = 'Agregar personas con Gasto'
+    const gastoTotal = ref(0);
+    const { personas } = usePersonasStore()
 
     const currentPersona = ref('')
     const currentPersonaId = ref('');
@@ -14,12 +16,10 @@
 
     const showNewGastoInput = ref(false);
     const showEditGastoInput = ref(false);
-    const personas = ref([])
 
-    const gastoPersona = persona => `Total: $${persona.gastos.reduce((a, b) => a+Number(b.importe), 0)}`
-
-    const getPersona = (id) => personas.value.filter(_persona => _persona.id === id)[0]
-    const getGasto = (persona, idGasto) => persona.gastos.filter(_gasto=>_gasto.id === idGasto)[0]
+    const gastoPersona = (persona) => persona.gastos.reduce((a, b) => a+Number(b.importe), 0)
+    const getPersona= (id) => personas.filter(_persona => _persona.id === id)[0]
+    const getGasto= (persona, idGasto) => persona.gastos.filter(_gasto=>_gasto.id === idGasto)[0]
 
     const limpiarEstados = () => {
         currentPersonaId.value = '';
@@ -36,9 +36,9 @@
         if (!currentPersona.value) return;
 
         /* Si 'currentPersona' ya existe exit */
-        if (personas.value.some(el => el.name === currentPersona.value)) return;
+        if (personas.some(el => el.name === currentPersona.value)) return;
 
-        personas.value.push(
+        personas.push(
             {
                 id: `p-${crypto.randomUUID()}`,
                 name: currentPersona.value,
@@ -63,6 +63,14 @@
                 que: currentGasto.value
             }
         )
+
+        let gastoTot = 0;
+        personas.map(item=>{
+           const gastoPersona = item.gastos.reduce((ptotal, g)=> ptotal+Number(g.importe),0)
+           gastoTot+=gastoPersona;
+        })
+
+        gastoTotal.value = gastoTot
 
         limpiarEstados();
     }
@@ -97,25 +105,28 @@
 <template>
     <main class="w-96 flex flex-col mx-auto my-16 h-auto m-10 text-default space-y-4">
         <!-- Agregar Persona -->
-        <section class="w-full h-auto bg-secondary p-2 rounded-xl ">
-            <h1 class="text-xl">{{ MSG_AGREGAR_PERSONAS }}</h1>
+        <section class="w-full h-auto bg-secondary py-2 px-4 rounded-xl ">
+            <h1 class="text-xl">Agregar personas con Gasto</h1>
             <div class="my-4 space-y-4">
-                <div class="flex justify-between items-center bg-white rounded-xl p-4">
+                <div class="flex justify-between items-center bg-white rounded-xl px-4 py-2">
                     <input autofocus type="text" class="outline-none bg-inherit placeholder:text-xl placeholder:opacity-50" v-model="currentPersona" placeholder="(nombre)">
                     <svg fill="none" viewBox="0 0 24 24" stroke-width="1" class="w-10 h-10 stroke-default" @click="newPersona">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
             </div>
+            <div class="w-full flex-col justify-center items-center text-xl font-bold">
+                <h1> Total Gastado: ${{ gastoTotal }} </h1>
+            </div>
         </section>
         <!-- Lista Personas Existentes -->
-        <section class="w-full h-auto bg-secondary p-2 rounded-xl">
+        <section class="w-full h-auto bg-secondary py-2 px-4 rounded-xl">
             <h1 class="text-left text-xl">Personas Existentes ({{ personas.length }})</h1>
             <div v-if="personas.length>0" class="my-4 space-y-4">
                 <div v-for="(persona,i) in personas" :id='`personaEntry_${i}`' class="flex flex-col bg-white rounded-xl p-4">
                     <div class="flex justify-between items-center">
                         <h2 class="font-semibold text-2xl">{{ persona.name }}</h2>
-                        <h2 class="font-bold text-right">{{ gastoPersona(persona) }}</h2>
+                        <h2 class="font-bold text-right">Total: ${{ gastoPersona(persona) }}</h2>
                     </div>
                     <!-- Persona encabezado  -->
                     <div class="flex justify-between items-center ">
@@ -170,5 +181,13 @@
                 </div>
             </div>
         </section>
+        <!-- finalizar carga -->
+
+            <button class="w-60 flex mx-auto justify-between items-center bg-black text-white  rounded-xl py-2 px-4 text-center">Finalizar carga de gastos<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 stroke-white  ">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                </svg>
+            </button>
+
+
     </main>
 </template>
