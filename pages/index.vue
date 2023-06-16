@@ -72,6 +72,7 @@
         })
         return gastoTot;
     }
+
     const confirmarGasto = (persona) => {
         persona.gastos.push(
             {
@@ -118,7 +119,7 @@
 
         const mensajeClipboard = getMensajeClipboard(total);
 
-        //navigator.clipboard.writeText(mensajeClipboard);
+        navigator.clipboard.writeText(total);
     }
 
     const resultadosFinales = (per) => {
