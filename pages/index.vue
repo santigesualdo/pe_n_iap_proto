@@ -1,9 +1,8 @@
 
 <script setup>
-    import { usePersonasStore } from '@/stores/PersonasStore'
     import { nextTick, onMounted } from 'vue'
 
-    const { personas } = usePersonasStore()
+    const personas = ref([])
     const gastoTotal = ref(0)
 
     const personasTotal = ref(0)
@@ -25,7 +24,7 @@
 
     const calculoTotal = (personas) => {
         let gastoTot = 0;
-        personas.map(item=>{
+        personas.value.map(item=>{
            const gastoPersona = item.gastos.reduce((ptotal, g)=> ptotal+Number(g.importe),0)
            gastoTot+=gastoPersona;
         })
@@ -36,7 +35,7 @@
     })
 
     const gastoPersona = (persona) => persona.gastos.reduce((a, b) => a+Number(b.importe), 0)
-    const getPersona= (id) => personas.filter(_persona => _persona.id === id)[0]
+    const getPersona= (id) => personas.value.filter(_persona => _persona.id === id)[0]
     const getGasto= (persona, idGasto) => persona.gastos.filter(_gasto=>_gasto.id === idGasto)[0]
 
     const limpiarEstados = () => {
@@ -54,9 +53,9 @@
         if (!currentPersona.value) return;
 
         /* Si 'currentPersona' ya existe exit */
-        if (personas.some(el => el.name === currentPersona.value)) return;
+        if (personas.value.some(el => el.name === currentPersona.value)) return;
 
-        personas.push(
+        personas.value.push(
             {
                 id: `p-${crypto.randomUUID()}`,
                 name: currentPersona.value,
